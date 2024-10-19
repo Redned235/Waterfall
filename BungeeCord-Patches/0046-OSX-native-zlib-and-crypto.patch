@@ -1,54 +1,22 @@
-From d2ee8dce1c0b939e6d60695edd93b7132cd8b43b Mon Sep 17 00:00:00 2001
+From dff404c0f83c459dae1c0ceead0ed4447c72a7c2 Mon Sep 17 00:00:00 2001
 From: Colin Godsey <crgodsey@gmail.com>
 Date: Tue, 16 Apr 2019 07:25:52 -0600
 Subject: [PATCH] OSX native zlib and crypto
 
 
 diff --git a/native/compile-native.sh b/native/compile-native.sh
-index c342e782..2ee8df94 100755
+index a47bc812..04ad419e 100755
 --- a/native/compile-native.sh
 +++ b/native/compile-native.sh
-@@ -8,7 +8,17 @@ echo "Compiling mbedtls"
- echo "Compiling zlib"
- (cd zlib && CFLAGS=-fPIC ./configure --static && make)
+@@ -15,7 +15,7 @@ CFLAGS="-c -fPIC -O3 -Wall -Werror -I$JAVA_HOME/include/ -I$JAVA_HOME/include/li
+ LDFLAGS="-shared"
  
--CXX="g++ -shared -fPIC -O3 -Wall -Werror -I$JAVA_HOME/include/ -I$JAVA_HOME/include/linux/"
-+# Waterfall - rewrite below to extend platform support
-+CXX="g++ -shared -fPIC -O3 -Wall -Werror"
+ echo "Compiling bungee"
+-$CC $CFLAGS -o shared.o src/main/c/shared.c 
++$CC $CFLAGS -o shared.o src/main/c/shared.c
+ $CC $CFLAGS -Imbedtls/include -o NativeCipherImpl.o src/main/c/NativeCipherImpl.c
+ $CC $CFLAGS -Izlib -o NativeCompressImpl.o src/main/c/NativeCompressImpl.c
  
--$CXX -Imbedtls/include src/main/c/NativeCipherImpl.cpp -o src/main/resources/native-cipher.so mbedtls/library/libmbedcrypto.a
--$CXX -Izlib src/main/c/NativeCompressImpl.cpp -o src/main/resources/native-compress.so zlib/libz.a
-+if [[ "$OSTYPE" == "darwin"* ]]; then
-+  PREFIX="osx-"
-+  CXX_ARGS="-I$JAVA_HOME/include/ -I$JAVA_HOME/include/darwin/"
-+else
-+  CXX_ARGS="-I$JAVA_HOME/include/ -I$JAVA_HOME/include/linux/ -Wl,--wrap=memcpy"
-+fi
-+
-+CXX="g++ -shared -fPIC -O3 -Wall -Werror"
-+
-+$CXX -Imbedtls/include src/main/c/NativeCipherImpl.cpp -o src/main/resources/${PREFIX:-}native-cipher.so mbedtls/library/libmbedcrypto.a $CXX_ARGS
-+$CXX -Izlib src/main/c/NativeCompressImpl.cpp -o src/main/resources/${PREFIX:-}native-compress.so zlib/libz.a $CXX_ARGS
-diff --git a/native/src/main/java/net/md_5/bungee/jni/NativeCode.java b/native/src/main/java/net/md_5/bungee/jni/NativeCode.java
-index 62bdaa0e..5218ffc3 100644
---- a/native/src/main/java/net/md_5/bungee/jni/NativeCode.java
-+++ b/native/src/main/java/net/md_5/bungee/jni/NativeCode.java
-@@ -20,6 +20,7 @@ public final class NativeCode<T>
- 
-     public NativeCode(String name, Supplier<? extends T> javaImpl, Supplier<? extends T> nativeImpl)
-     {
-+        if ("Mac OS X".equals( System.getProperty( "os.name" ))) name = "osx-" + name; // Waterfall
-         this.name = name;
-         this.javaImpl = javaImpl;
-         this.nativeImpl = nativeImpl;
-@@ -75,6 +76,6 @@ public final class NativeCode<T>
- 
-     public static boolean isSupported()
-     {
--        return "Linux".equals( System.getProperty( "os.name" ) ) && "amd64".equals( System.getProperty( "os.arch" ) );
-+        return ("Linux".equals( System.getProperty( "os.name" ) ) && ("amd64".equals( System.getProperty( "os.arch" ) ) || "x86_64".equals( System.getProperty( "os.arch" )))) || ("Mac OS X".equals( System.getProperty( "os.name" ) ) && "aarch64".equals( System.getProperty( "os.arch" ) )); // Waterfall
-     }
- }
 diff --git a/native/src/main/resources/osx-native-cipher.so b/native/src/main/resources/osx-native-cipher.so
 new file mode 100755
 index 0000000000000000000000000000000000000000..13ce8b6df298be2f4e1693e008371a8770d3b41f
@@ -845,5 +813,5 @@ literal 0
 HcmV?d00001
 
 -- 
-2.44.0
+2.32.0
 
