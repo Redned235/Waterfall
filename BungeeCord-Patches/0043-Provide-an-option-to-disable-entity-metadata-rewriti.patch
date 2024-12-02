@@ -1,4 +1,4 @@
-From a4626a557f1354f0b07e96e927d18df21cd49258 Mon Sep 17 00:00:00 2001
+From 2c356ba28efaba186336a76be2f4f41cbb472f2c Mon Sep 17 00:00:00 2001
 From: Shane Freeder <theboyetronic@gmail.com>
 Date: Mon, 14 Jan 2019 03:35:21 +0000
 Subject: [PATCH] Provide an option to disable entity metadata rewriting
@@ -123,10 +123,10 @@ index 6f49765f..c199abb8 100644
                      (byte) 0, login.getDeathLocation(), login.getPortalCooldown(), login.getSeaLevel() ) );
              if ( user.getPendingConnection().getVersion() >= ProtocolConstants.MINECRAFT_1_14 )
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index df160672..a84f9b12 100644
+index 05116ba0..dd215795 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-@@ -821,4 +821,9 @@ public final class UserConnection implements ProxiedPlayer
+@@ -835,4 +835,9 @@ public final class UserConnection implements ProxiedPlayer
  
          unsafe().sendPacket( new Transfer( host, port ) );
      }
@@ -157,7 +157,7 @@ index b131f794..1290d756 100644
      }
  
 diff --git a/proxy/src/main/java/net/md_5/bungee/entitymap/EntityMap.java b/proxy/src/main/java/net/md_5/bungee/entitymap/EntityMap.java
-index 699bbe3a..0f9f5957 100644
+index fab7e9b9..84a090b9 100644
 --- a/proxy/src/main/java/net/md_5/bungee/entitymap/EntityMap.java
 +++ b/proxy/src/main/java/net/md_5/bungee/entitymap/EntityMap.java
 @@ -27,6 +27,11 @@ public abstract class EntityMap
@@ -172,7 +172,7 @@ index 699bbe3a..0f9f5957 100644
          switch ( version )
          {
              case ProtocolConstants.MINECRAFT_1_8:
-@@ -307,7 +312,13 @@ public abstract class EntityMap
+@@ -309,7 +314,13 @@ public abstract class EntityMap
                      DefinedPacket.readVarInt( packet );
                      break;
                  default:
